@@ -1,0 +1,558 @@
+basePath: /v1/
+definitions:
+  controller.CreateFieldBody:
+    properties:
+      category:
+        type: string
+      data:
+        items:
+          $ref: '#/definitions/model.SysField'
+        type: array
+    type: object
+  controller.CreateInstanceBody:
+    properties:
+      data:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+    type: object
+  controller.FieldTypeForGet:
+    properties:
+      can_unique:
+        description: 字段是否可以设置唯一，与isUnique一起用于判断是否要创建唯一索引
+        type: boolean
+      cmdb_name:
+        description: 内置CMDB字段名(仅用于展示)
+        type: string
+      index:
+        description: cmdb内置字段序号
+        type: integer
+      is_string:
+        description: 是否以字符串形式设置默认值
+        type: boolean
+      sql_type:
+        description: 对应mysql中的字段类型
+        type: string
+    type: object
+  controller.GetFieldTypeResponse:
+    properties:
+      Data:
+        items:
+          $ref: '#/definitions/controller.FieldTypeForGet'
+        type: array
+      Meta:
+        $ref: '#/definitions/myhttp.Meta'
+      Total:
+        type: integer
+    type: object
+  controller.GetInstanceRequestBody:
+    properties:
+      category:
+        type: string
+      id_list:
+        items:
+          type: integer
+        type: array
+      keyword:
+        type: string
+      limit:
+        type: integer
+      offset:
+        type: integer
+      order:
+        type: string
+      query:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  controller.UpdateFieldBody:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      is_editable:
+        type: boolean
+      is_required:
+        type: boolean
+      label:
+        type: string
+    type: object
+  controller.UpdateInstanceBody:
+    properties:
+      data:
+        items:
+          additionalProperties: true
+          type: object
+        type: array
+    type: object
+  model.SysCategory:
+    properties:
+      create_by:
+        type: string
+      created_at:
+        type: string
+      description:
+        description: 模型描述
+        type: string
+      id:
+        type: integer
+      label:
+        description: 模型名(仅用于展示)
+        type: string
+      name:
+        description: 模型名(建表时用)
+        type: string
+      update_at:
+        type: string
+      update_by:
+        type: string
+    type: object
+  model.SysField:
+    properties:
+      default:
+        description: 默认值
+        type: string
+      description:
+        description: 字段描述
+        type: string
+      is_editable:
+        description: 字段是否可编辑(会在实例更新时对不可编辑的字段进行过滤)
+        type: boolean
+      is_required:
+        description: 是否必填(会在创建实例时进行校验)
+        type: boolean
+      label:
+        description: 字段名(仅用于展示)
+        type: string
+      name:
+        description: 字段名(建表时用)
+        type: string
+      not_null:
+        description: 是否不可为NULL
+        type: boolean
+      type:
+        description: 字段对应的CMDB内置字段类型序号
+        type: integer
+    type: object
+  myhttp.Meta:
+    properties:
+      Code:
+        type: integer
+      Message:
+        type: string
+    type: object
+  myhttp.Responds:
+    properties:
+      Data:
+        type: object
+      Meta:
+        $ref: '#/definitions/myhttp.Meta'
+    type: object
+info:
+  contact: {}
+  description: CMDB.
+  title: CMDB-API文档
+  version: 0.0.1
+paths:
+  /?Action=GetCMDBInstance:
+    post:
+      description: 获取数据实例
+      parameters:
+      - description: body
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/controller.GetInstanceRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 获取数据实例
+      tags:
+      - Instance
+  /?Action=UpdateCMDBInstance:
+    post:
+      description: 修改数据实例，只根据uuid进行更新
+      parameters:
+      - description: 元数据表名
+        in: path
+        name: category
+        required: true
+        type: string
+      - description: 需要修改的数据实例
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UpdateInstanceBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 修改数据实例
+      tags:
+      - Instance
+  /category/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建模型
+      parameters:
+      - description: 创建模型
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/model.SysCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 创建模型
+      tags:
+      - Category
+  /category/delete:
+    delete:
+      description: 删除模型
+      parameters:
+      - description: 表模型ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 删除模型
+      tags:
+      - Category
+  /category/get:
+    get:
+      description: 获取模型
+      parameters:
+      - description: 表模型ID, 暂不支持多个查询
+        in: query
+        name: id
+        type: integer
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 排序, 支持desc和asc
+        in: query
+        name: order
+        type: string
+      - description: 分页条数
+        in: query
+        name: limit
+        type: integer
+      - description: 分页偏移量
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 获取模型
+      tags:
+      - Category
+  /field/{id}:
+    delete:
+      description: 删除字段
+      parameters:
+      - description: 字段元数据ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 删除字段
+      tags:
+      - Field
+  /field/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建字段
+      parameters:
+      - description: 创建字段
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateFieldBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 创建字段
+      tags:
+      - Field
+  /field/get:
+    get:
+      description: 获取字段
+      parameters:
+      - description: 字段元数据ID, 暂不支持多个查询
+        in: query
+        name: id
+        type: integer
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 排序, 支持desc和asc
+        in: query
+        name: order
+        type: string
+      - description: 分页条数
+        in: query
+        name: limit
+        type: integer
+      - description: 分页偏移量
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 获取字段
+      tags:
+      - Field
+  /field/update:
+    put:
+      description: 修改字段，只能修改字段的业务属性
+      parameters:
+      - description: 修改字段结构体
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UpdateFieldBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 修改字段
+      tags:
+      - Field
+  /fieldType/:
+    get:
+      description: 获取字段
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.GetFieldTypeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 获取字段
+      tags:
+      - FieldType
+  /instance/{category}:
+    delete:
+      description: 删除数据（软删除，如果有唯一约束，在重新插入时会报错）
+      parameters:
+      - description: 元数据表名
+        in: path
+        name: category
+        required: true
+        type: string
+      - description: 数据实例的uuid，多个值以半角逗号分隔
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 删除数据
+      tags:
+      - Instance
+    post:
+      consumes:
+      - application/json
+      description: 创建实例
+      parameters:
+      - description: 元数据表名
+        in: path
+        name: category
+        required: true
+        type: string
+      - description: 创建实例
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateInstanceBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: 创建实例
+      tags:
+      - Instance
+  /system/:
+    get:
+      consumes:
+      - application/json
+      description: init
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: init
+      tags:
+      - System
+  /system/migrate:
+    put:
+      description: 迁移
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/myhttp.Responds'
+      summary: migrate
+      tags:
+      - System
+swagger: "2.0"
